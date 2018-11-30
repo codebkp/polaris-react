@@ -121,12 +121,13 @@ class Header extends React.PureComponent<CombinedProps, State> {
       </div>
     ) : null;
 
+    const rollupMarkup = this.renderRollupAction();
     const nonPrimaryActionsMarkup = this.renderSecondaryActions();
 
     const actionsMarkup = (
       <div className={styles.Actions}>
-        {primaryActionMarkup}
         {nonPrimaryActionsMarkup}
+        {primaryActionMarkup}
       </div>
     );
 
@@ -135,6 +136,7 @@ class Header extends React.PureComponent<CombinedProps, State> {
         <div className={styles.Navigation}>
           {breadcrumbMarkup}
           {paginationMarkup}
+          {rollupMarkup}
         </div>
       ) : null;
 
@@ -175,8 +177,38 @@ class Header extends React.PureComponent<CombinedProps, State> {
     return secondaryActions.length + actionGroups.length > 1;
   }
 
+  @autobind
+  private renderRollupAction() {
+    const {rollupOpen} = this.state;
+    const {secondaryActions = [], actionGroups = []} = this.props;
+    const rollupMarkup = this.hasRollup ? (
+      <div className={styles.Rollup}>
+        <Popover
+          active={rollupOpen}
+          onClose={this.handleRollupToggle}
+          activator={
+            <Button
+              plain
+              icon="horizontalDots"
+              onClick={this.handleRollupToggle}
+            />
+          }
+        >
+          <ActionList
+            items={secondaryActions}
+            sections={actionGroups.map(convertActionGroupToActionListSection)}
+            onActionAnyItem={this.handleRollupToggle}
+          />
+        </Popover>
+      </div>
+    ) : null;
+
+    return rollupMarkup;
+  }
+
+  @autobind
   private renderSecondaryActions() {
-    const {openActionGroup, rollupOpen} = this.state;
+    const {openActionGroup} = this.state;
     const {secondaryActions = [], actionGroups = []} = this.props;
 
     if (secondaryActions.length === 0 && actionGroups.length === 0) {
@@ -208,29 +240,8 @@ class Header extends React.PureComponent<CombinedProps, State> {
           ))
         : null;
 
-    const rollupMarkup = this.hasRollup ? (
-      <div className={styles.Rollup}>
-        <Popover
-          active={rollupOpen}
-          onClose={this.handleRollupToggle}
-          activator={
-            <Button disclosure onClick={this.handleRollupToggle}>
-              Actions
-            </Button>
-          }
-        >
-          <ActionList
-            items={secondaryActions}
-            sections={actionGroups.map(convertActionGroupToActionListSection)}
-            onActionAnyItem={this.handleRollupToggle}
-          />
-        </Popover>
-      </div>
-    ) : null;
-
     return (
       <div className={styles.SecondaryActions}>
-        {rollupMarkup}
         <div className={styles.IndividualActions}>
           {secondaryActionMarkup}
           {actionGroupsMarkup}

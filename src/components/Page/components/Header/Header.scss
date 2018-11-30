@@ -5,8 +5,9 @@ $action-horizontal-padding: (1.5 * spacing(tight));
 }
 
 .Header-hasPagination,
-.Header-hasBreadcrumbs {
-  @include page-header-has-pagination-and-breadcrumbs;
+.Header-hasBreadcrumbs,
+.Header-hasRollup {
+  @include page-header-has-navigation;
 }
 
 .Header-hasSecondaryActions {
@@ -23,8 +24,22 @@ $action-horizontal-padding: (1.5 * spacing(tight));
 }
 
 .Header-hasRollup {
+  .SecondaryActions {
+    display: none;
+  }
+
   .IndividualActions {
     display: none;
+  }
+
+  .Pagination {
+    display: none;
+  }
+
+  &.Header-hasBreadcrumbs {
+    .Navigation {
+      @include page-header-has-breadcrumbs-and-rollup;
+    }
   }
 
   @include page-content-when-not-partially-condensed {
@@ -32,7 +47,15 @@ $action-horizontal-padding: (1.5 * spacing(tight));
       display: none;
     }
 
+    .SecondaryActions {
+      display: flex;
+    }
+
     .IndividualActions {
+      display: flex;
+    }
+
+    .Pagination {
       display: flex;
     }
   }
@@ -44,7 +67,7 @@ $action-horizontal-padding: (1.5 * spacing(tight));
 
 .PrimaryAction {
   display: flex;
-  align-self: stretch;
+  // align-self: stretch;
   align-items: center;
 
   .MainContent > & {
@@ -61,6 +84,10 @@ $action-horizontal-padding: (1.5 * spacing(tight));
   }
 }
 
+.Rollup {
+  justify-self: flex-end;
+}
+
 .Pagination {
   margin-left: auto;
   line-height: 1;
@@ -72,7 +99,7 @@ $action-horizontal-padding: (1.5 * spacing(tight));
 
 .Navigation {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin-bottom: spacing(extra-tight);
 }
 
