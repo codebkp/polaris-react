@@ -93,6 +93,7 @@ export default class PositionedOverlay extends React.PureComponent<
     }
   }
 
+  // eslint-disable-next-line react/no-deprecated
   componentWillReceiveProps() {
     this.handleMeasurement();
   }
@@ -116,9 +117,9 @@ export default class PositionedOverlay extends React.PureComponent<
     const {render, fixed} = this.props;
 
     const style = {
-      top: top || undefined,
-      left: left || undefined,
-      width: width || undefined,
+      top: top == null ? undefined : top,
+      left: left == null ? undefined : left,
+      width: width == null ? undefined : width,
       zIndex: zIndex == null ? undefined : zIndex,
     };
 
@@ -178,7 +179,13 @@ export default class PositionedOverlay extends React.PureComponent<
           fixed,
         } = this.props;
 
-        const activatorRect = getRectForNode(activator);
+        const textFieldActivator = activator.querySelector('input');
+
+        const activatorRect =
+          textFieldActivator != null
+            ? getRectForNode(textFieldActivator)
+            : getRectForNode(activator);
+
         const currentOverlayRect = getRectForNode(this.overlay);
         const scrollableElement = isDocument(this.scrollableContainer)
           ? document.body

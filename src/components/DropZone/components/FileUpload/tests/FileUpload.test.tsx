@@ -1,45 +1,40 @@
 import * as React from 'react';
-import {shallowWithAppProvider} from '../../../../../../tests/utilities';
+import {Link, Icon, Button, Caption, TextStyle} from 'components';
+import {mountWithAppProvider} from 'test-utilities';
+import {Provider} from '../../Context';
+import FileUpload from '../FileUpload';
 
-import Link from '../../../../Link';
-import Icon from '../../../../Icon';
-import Button from '../../../../Button';
-import DropZone from '../../../DropZone';
-import Caption from '../../../../Caption';
-import TextStyle from '../../../../TextStyle';
-
-describe('<DropZone />', () => {
+describe('<FileUpload />', () => {
   it('renders large view', () => {
-    const fileUpload = shallowWithAppProvider(<DropZone.FileUpload />, {
-      context: {
-        size: 'large',
-        type: 'file',
-      },
-    });
+    const fileUpload = mountWithAppProvider(
+      <Provider value={{size: 'large', type: 'file'}}>
+        <FileUpload />
+      </Provider>,
+    );
 
-    expect(fileUpload.find('img').length).toBe(1);
-    expect(fileUpload.find(Button).length).toBe(1);
-    expect(fileUpload.find(TextStyle).length).toBe(1);
+    expect(fileUpload.find('img')).toHaveLength(1);
+    expect(fileUpload.find(Button)).toHaveLength(1);
+    expect(fileUpload.find(TextStyle)).toHaveLength(1);
   });
 
   it('renders medium view', () => {
-    const fileUpload = shallowWithAppProvider(<DropZone.FileUpload />, {
-      context: {
-        size: 'medium',
-      },
-    });
+    const fileUpload = mountWithAppProvider(
+      <Provider value={{size: 'medium', type: 'file'}}>
+        <FileUpload />
+      </Provider>,
+    );
 
-    expect(fileUpload.find(Link).length).toBe(1);
-    expect(fileUpload.find(Caption).length).toBe(1);
+    expect(fileUpload.find(Link)).toHaveLength(1);
+    expect(fileUpload.find(Caption)).toHaveLength(1);
   });
 
   it('renders small view', () => {
-    const fileUpload = shallowWithAppProvider(<DropZone.FileUpload />, {
-      context: {
-        size: 'small',
-      },
-    });
+    const fileUpload = mountWithAppProvider(
+      <Provider value={{size: 'small', type: 'file'}}>
+        <FileUpload />
+      </Provider>,
+    );
 
-    expect(fileUpload.find(Icon).length).toBe(1);
+    expect(fileUpload.find(Icon)).toHaveLength(1);
   });
 });

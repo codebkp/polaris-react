@@ -10,7 +10,9 @@ import Indicator from '../Indicator';
 
 import * as styles from './Button.scss';
 
-export type Size = 'slim' | 'large';
+export type Size = 'slim' | 'medium' | 'large';
+
+export type IconSource = IconProps['source'];
 
 export interface Props {
   /** The content to display inside the button */
@@ -27,7 +29,10 @@ export interface Props {
   disabled?: boolean;
   /** Replaces button text with a spinner while a background action is being performed */
   loading?: boolean;
-  /** Changes the size of the button, giving it more or less padding */
+  /**
+   * Changes the size of the button, giving it more or less padding
+   * @default 'medium'
+   */
   size?: Size;
   /** Gives the button a subtle alternative to the default button styling, appropriate for certain backdrops */
   outline?: boolean;
@@ -42,7 +47,7 @@ export interface Props {
   /** Forces url to open in a new tab */
   external?: boolean;
   /** Icon to display to the left of the button content */
-  icon?: IconProps['source'];
+  icon?: React.ReactNode | IconSource;
   /** Visually hidden text for screen readers */
   accessibilityLabel?: string;
   /** Id of the element the button controls */
@@ -58,6 +63,8 @@ export interface Props {
 }
 
 export type CombinedProps = Props & WithAppProviderProps;
+
+const DEFAULT_SIZE = 'medium';
 
 function Button({
   id,
@@ -79,7 +86,7 @@ function Button({
   disclosure,
   plain,
   submit,
-  size,
+  size = DEFAULT_SIZE,
   fullWidth,
   polaris: {intl},
 }: CombinedProps) {
@@ -93,22 +100,27 @@ function Button({
     isDisabled && styles.disabled,
     loading && styles.loading,
     plain && styles.plain,
-    size && styles[variationName('size', size)],
+    size && size !== DEFAULT_SIZE && styles[variationName('size', size)],
     fullWidth && styles.fullWidth,
     icon && children == null && styles.iconOnly,
   );
 
   const disclosureIconMarkup = disclosure ? (
-    <span className={styles.Icon}>
+    <IconWrapper>
       <Icon source={loading ? 'placeholder' : 'caretDown'} />
-    </span>
+    </IconWrapper>
   ) : null;
 
-  const iconMarkup = icon ? (
-    <span className={styles.Icon}>
+  let iconMarkup;
+
+  if (icon) {
+    const iconInner = isIconSource(icon) ? (
       <Icon source={loading ? 'placeholder' : icon} />
-    </span>
-  ) : null;
+    ) : (
+      icon
+    );
+    iconMarkup = <IconWrapper>{iconInner}</IconWrapper>;
+  }
 
   const childMarkup = children ? <span>{children}</span> : null;
 
@@ -181,6 +193,14 @@ function Button({
       {content}
     </button>
   );
+}
+
+export function IconWrapper({children}: any) {
+  return <span className={styles.Icon}>{children}</span>;
+}
+
+function isIconSource(x: any): x is IconSource {
+  return typeof x === 'string' || (typeof x === 'object' && x.body);
 }
 
 export default withAppProvider<Props>()(Button);

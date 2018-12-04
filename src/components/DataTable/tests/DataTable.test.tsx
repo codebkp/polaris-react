@@ -1,9 +1,8 @@
 import * as React from 'react';
-import {mountWithAppProvider} from '../../../../tests/utilities';
-
-import {findByTestID} from '../../../../tests/utilities/enzyme';
+import {mountWithAppProvider, findByTestID} from 'test-utilities';
+import {isEdgeVisible, getPrevAndCurrentColumns} from '../utilities';
+import {Cell, Navigation} from '../components';
 import DataTable, {CombinedProps as Props} from '../DataTable';
-import {Cell} from '../components';
 
 interface DataTableTestProps {
   sortable?: Props['sortable'];
@@ -54,17 +53,20 @@ function setup(propOverrides?: DataTableTestProps) {
 }
 
 describe('<DataTable />', () => {
-  it('renders all table body rows', () => {
+  it('renders a table, thead and all table body rows', () => {
     const {dataTable} = setup();
 
-    expect(dataTable.find('tbody tr').length).toEqual(3);
+    expect(dataTable.find('table')).toHaveLength(1);
+    expect(dataTable.find('thead')).toHaveLength(1);
+    expect(dataTable.find('thead th')).toHaveLength(5);
+    expect(dataTable.find('tbody tr')).toHaveLength(3);
   });
 
   it('defaults to non-sorting column headings', () => {
     const {dataTable} = setup();
     const sortableHeadings = dataTable.find(Cell).filter({sortable: true});
 
-    expect(sortableHeadings.length).toEqual(0);
+    expect(sortableHeadings).toHaveLength(0);
   });
 
   it('initial sort column defaults to first column if not specified', () => {
@@ -87,5 +89,97 @@ describe('<DataTable />', () => {
     const fifthHeadingCell = findByTestID(dataTable, `heading-cell-${4}`);
 
     expect(fifthHeadingCell.props().sorted).toBe(true);
+  });
+
+  describe('<Cell />', () => {
+    const {dataTable} = setup();
+    it('passes all props', () => {
+      expect(
+        dataTable
+          .find(Cell)
+          .first()
+          .prop('header'),
+      ).toBe(true);
+      expect(
+        dataTable
+          .find(Cell)
+          .first()
+          .prop('content'),
+      ).toEqual('Product');
+      expect(
+        dataTable
+          .find(Cell)
+          .first()
+          .prop('contentType'),
+      ).toEqual('text');
+    });
+  });
+
+  describe('<Navigation />', () => {
+    const {dataTable} = setup();
+    it('passes scroll props', () => {
+      expect(
+        dataTable
+          .find(Navigation)
+          .first()
+          .prop('isScrolledFarthestLeft'),
+      ).toBe(true);
+      expect(
+        dataTable
+          .find(Navigation)
+          .first()
+          .prop('isScrolledFarthestRight'),
+      ).toBe(false);
+    });
+  });
+
+  describe('isEdgeVisible()', () => {
+    it('returns true if there is enough room', () => {
+      const position = 175;
+      const tableStart = 145;
+      const tableEnd = 205;
+
+      const isVisible = isEdgeVisible(position, tableStart, tableEnd);
+
+      expect(isVisible).toBe(true);
+    });
+
+    it('returns false if there is not enough room', () => {
+      const position = 175;
+      const tableStart = 145;
+      const tableEnd = 200;
+
+      const isVisible = isEdgeVisible(position, tableStart, tableEnd);
+
+      expect(isVisible).toBe(false);
+    });
+  });
+
+  describe('getPrevAndCurrentColumns()', () => {
+    it('returns the correct measurements', () => {
+      const columnVisibilityData = [
+        {leftEdge: 145, rightEdge: 236, isVisible: true},
+        {leftEdge: 236, rightEdge: 357, isVisible: true},
+        {leftEdge: 357, rightEdge: 474, isVisible: true},
+        {leftEdge: 474, rightEdge: 601, isVisible: true},
+      ];
+
+      const tableData = {
+        fixedColumnWidth: 145,
+        firstVisibleColumnIndex: 3,
+        tableLeftVisibleEdge: 145,
+        tableRightVisibleEdge: 551,
+      };
+
+      const actualMeasurement = getPrevAndCurrentColumns(
+        tableData,
+        columnVisibilityData,
+      );
+      const expectedMeasurement = {
+        previousColumn: {leftEdge: 357, rightEdge: 474, isVisible: true},
+        currentColumn: {leftEdge: 474, rightEdge: 601, isVisible: true},
+      };
+      expect(actualMeasurement).toEqual(expectedMeasurement);
+    });
   });
 });

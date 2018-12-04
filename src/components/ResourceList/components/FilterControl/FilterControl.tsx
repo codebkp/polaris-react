@@ -1,11 +1,19 @@
 import * as React from 'react';
 import {autobind, memoize} from '@shopify/javascript-utilities/decorators';
+import compose from '@shopify/react-compose';
+import {ComplexAction, WithContextTypes} from '../../../../types';
 import {withAppProvider, WithAppProviderProps} from '../../../AppProvider';
-import {contextTypes} from '../../types';
-import {ComplexAction} from '../../../../types';
-import {buttonsFrom, TextField, Icon, Tag, FormLayout} from '../../..';
+import {buttonsFrom} from '../../../Button';
+import Icon from '../../../Icon';
+import FormLayout from '../../../FormLayout';
+import TextField from '../../../TextField';
+import Tag from '../../../Tag';
+import withContext from '../../../WithContext';
 
-import FilterCreator from './FilterCreator';
+import {ResourceListContext} from '../../types';
+import {Consumer} from '../Context';
+
+import {FilterCreator} from './components';
 import {AppliedFilter, Filter, FilterType, Operator} from './types';
 import * as styles from './FilterControl.scss';
 
@@ -20,14 +28,12 @@ export interface Props {
   onFiltersChange?(appliedFilters: AppliedFilter[]): void;
 }
 
-export type CombinedProps = Props & WithAppProviderProps;
+export type CombinedProps = Props &
+  WithAppProviderProps &
+  WithContextTypes<ResourceListContext>;
 
 export class FilterControl extends React.Component<CombinedProps> {
-  static contextTypes = contextTypes;
-
   render() {
-    const {selectMode, resourceName} = this.context;
-
     const {
       searchValue,
       appliedFilters = [],
@@ -37,6 +43,7 @@ export class FilterControl extends React.Component<CombinedProps> {
       onSearchBlur,
       onSearchChange,
       polaris: {intl},
+      context: {selectMode, resourceName},
     } = this.props;
 
     const textFieldLabel = intl.translate(
@@ -289,4 +296,7 @@ function findOperatorLabel(filter: Filter, appliedFilter: AppliedFilter) {
   }
 }
 
-export default withAppProvider<Props>()(FilterControl);
+export default compose<Props>(
+  withAppProvider<Props>(),
+  withContext<Props, WithAppProviderProps, ResourceListContext>(Consumer),
+)(FilterControl);

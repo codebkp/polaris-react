@@ -28,8 +28,8 @@ Footer help should:
 - Be positioned at the bottom of the interface
 - Provide links to help that’s related to the experience on the screen
 - Not be used to promote features or provide explanations for how something works
-- Never link to information designed to upsell the merchant
-- In rare cases, link to blog posts when there isn’t any help documentation to help the merchant with the most logical next step in the workflow
+- Never link to information designed to upsell to merchants
+- In rare cases, link to blog posts when there isn’t any help documentation to help merchants with the most logical next step in the workflow
 
 If you’re a Shopify app developer, footer help could also:
 
@@ -49,7 +49,7 @@ By default, footer help should link to information in the Shopify Help Center an
 
 Links should be:
 
-Clearly labeled: Merchants shouldn't need to guess where they’ll end up if they click on an action link. Never use “click here” as a link because it doesn’t set expectations about what’s next.
+Clearly labeled: Merchants shouldn’t need to guess where they’ll end up if they click on an action link. Never use “click here” as a link because it doesn’t set expectations about what’s next.
 
 For Shopify app developers linking to contact information, footer help should follow this content pattern:
 

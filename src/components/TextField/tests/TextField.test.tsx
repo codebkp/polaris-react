@@ -1,13 +1,9 @@
 import * as React from 'react';
 import {noop} from '@shopify/javascript-utilities/other';
-import {
-  shallowWithAppProvider,
-  mountWithAppProvider,
-} from '../../../../tests/utilities';
-
-import InlineError from '../../InlineError';
-import TextField from '../../TextField';
+import {shallowWithAppProvider, mountWithAppProvider} from 'test-utilities';
+import {InlineError, Labelled, Connected, Select} from 'components';
 import {Resizer} from '../components';
+import TextField from '../TextField';
 
 describe('<TextField />', () => {
   it('allows specific props to pass through properties on the input', () => {
@@ -59,7 +55,7 @@ describe('<TextField />', () => {
       />,
     ).find('input');
 
-    expect(input.prop('prefix')).toBe(undefined);
+    expect(input.prop('prefix')).toBeUndefined();
   });
 
   it('focuses input and calls onFocus() when focused prop has been updated to true', () => {
@@ -127,6 +123,24 @@ describe('<TextField />', () => {
       expect(typeof id).toBe('string');
       expect(id).toBeTruthy();
     });
+
+    it('updates with the new id from props', () => {
+      const id = 'input field';
+      const textField = mountWithAppProvider(
+        <TextField label="TextField" onChange={noop} />,
+      );
+      textField.setProps({id});
+      expect(textField.find('input').prop('id')).toBe(id);
+    });
+
+    it('updates with the previous id after the id prop has been removed', () => {
+      const id = 'input field';
+      const textField = mountWithAppProvider(
+        <TextField label="TextField" id={id} onChange={noop} />,
+      );
+      textField.setProps({});
+      expect(textField.find('input').prop('id')).toBe(id);
+    });
   });
 
   describe('autoComplete', () => {
@@ -137,11 +151,11 @@ describe('<TextField />', () => {
       expect(textField.find('input').prop('autoComplete')).toBeUndefined();
     });
 
-    it('sets autoComplete to "off" when false', () => {
+    it('sets autoComplete to "nope" when false', () => {
       const textField = shallowWithAppProvider(
         <TextField label="TextField" autoComplete={false} onChange={noop} />,
       );
-      expect(textField.find('input').prop('autoComplete')).toBe('off');
+      expect(textField.find('input').prop('autoComplete')).toBe('nope');
     });
 
     it('sets autoComplete to "on" when false', () => {
@@ -225,7 +239,7 @@ describe('<TextField />', () => {
         .find('input')
         .prop<string>('aria-describedby')
         .split(' ');
-      expect(descriptions.length).toBe(2);
+      expect(descriptions).toHaveLength(2);
       expect(textField.find(`#${descriptions[0]}`).text()).toBe('Some error');
       expect(textField.find(`#${descriptions[1]}`).text()).toBe('Some help');
     });
@@ -256,7 +270,7 @@ describe('<TextField />', () => {
         .find('input')
         .prop<string>('aria-labelledby')
         .split(' ');
-      expect(labels.length).toBe(2);
+      expect(labels).toHaveLength(2);
       expect(textField.find(`#${labels[0]}`).text()).toBe('TextField');
       expect(textField.find(`#${labels[1]}`).text()).toBe('$');
     });
@@ -269,7 +283,7 @@ describe('<TextField />', () => {
         .find('input')
         .prop<string>('aria-labelledby')
         .split(' ');
-      expect(labels.length).toBe(3);
+      expect(labels).toHaveLength(3);
       expect(textField.find(`#${labels[0]}`).text()).toBe('TextField');
       expect(textField.find(`#${labels[1]}`).text()).toBe('$');
       expect(textField.find(`#${labels[2]}`).text()).toBe('.00');
@@ -285,7 +299,7 @@ describe('<TextField />', () => {
         .find('input')
         .prop<string>('aria-labelledby')
         .split(' ');
-      expect(labels.length).toBe(2);
+      expect(labels).toHaveLength(2);
       expect(textField.find(`#${labels[0]}`).text()).toBe('TextField');
       expect(textField.find(`#${labels[1]}`).text()).toBe('kg');
     });
@@ -488,7 +502,7 @@ describe('<TextField />', () => {
           />,
         );
         const buttons = element.find('[role="button"]');
-        expect(buttons.length).toBe(0);
+        expect(buttons).toHaveLength(0);
       });
 
       it('increments correctly when a value step or both are float numbers', () => {
@@ -542,6 +556,98 @@ describe('<TextField />', () => {
         />,
       );
       expect(textField.find(Resizer).exists()).toBe(false);
+    });
+  });
+
+  describe('aria labels', () => {
+    it('sets aria labels on the input element', () => {
+      const textField = shallowWithAppProvider(
+        <TextField
+          label="TextField"
+          id="MyField"
+          onChange={noop}
+          multiline={false}
+          ariaOwns="Aria owns"
+          ariaActiveDescendant="Aria active descendant"
+          ariaAutocomplete="Aria autocomplete"
+          ariaControls="Aria controls"
+        />,
+      );
+
+      expect(textField.find('input').prop('aria-owns')).toBe('Aria owns');
+      expect(textField.find('input').prop('aria-activedescendant')).toBe(
+        'Aria active descendant',
+      );
+      expect(textField.find('input').prop('aria-autocomplete')).toBe(
+        'Aria autocomplete',
+      );
+      expect(textField.find('input').prop('aria-controls')).toBe(
+        'Aria controls',
+      );
+    });
+  });
+
+  describe('Labelled', () => {
+    it('passes props to Labelled', () => {
+      const textField = mountWithAppProvider(
+        <TextField
+          label="TextField"
+          id="MyField"
+          onChange={noop}
+          helpText="Help text"
+        />,
+      );
+
+      expect(textField.find(Labelled)).toHaveLength(1);
+      expect(textField.find(Labelled).prop('label')).toBe('TextField');
+      expect(textField.find(Labelled).prop('id')).toBe('MyField');
+      expect(textField.find(Labelled).prop('helpText')).toBe('Help text');
+    });
+
+    it('passes error to Labelled', () => {
+      const textField = mountWithAppProvider(
+        <TextField label="TextField" id="MyField" onChange={noop} error />,
+      );
+
+      expect(textField.find(Labelled).prop('error')).toBe(true);
+    });
+
+    it('passes labelHidden to Labelled', () => {
+      const textField = mountWithAppProvider(
+        <TextField
+          label="TextField"
+          id="MyField"
+          onChange={noop}
+          labelHidden
+        />,
+      );
+
+      expect(textField.find(Labelled).prop('labelHidden')).toBe(true);
+    });
+  });
+
+  describe('Connected', () => {
+    it('passes props to Connected', () => {
+      const connectedLeft = (
+        <Select label="Currency unit" labelHidden options={['$', '€']} />
+      );
+      const connectedRight = (
+        <Select label="Weight unit" labelHidden options={['kg', 'lb']} />
+      );
+      const textField = mountWithAppProvider(
+        <TextField
+          label="TextField"
+          id="MyField"
+          onChange={noop}
+          connectedLeft={connectedLeft}
+          connectedRight={connectedRight}
+          prefix
+        />,
+      );
+
+      expect(textField.find(Connected)).toHaveLength(1);
+      expect(textField.find(Connected).prop('left')).toEqual(connectedLeft);
+      expect(textField.find(Connected).prop('right')).toEqual(connectedRight);
     });
   });
 });

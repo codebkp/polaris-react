@@ -8,11 +8,18 @@ export {default as ActionList, Props as ActionListProps} from './ActionList';
 export {
   default as AppProvider,
   Props as AppProviderProps,
+  Context as AppProviderContext,
   polarisAppProviderContextTypes as polarisContextTypes,
+  createAppProviderContext,
   createPolarisContext,
   withAppProvider,
   WithAppProviderProps,
 } from './AppProvider';
+
+export {
+  default as Autocomplete,
+  Props as AutocompleteProps,
+} from './Autocomplete';
 
 export {default as Avatar, Props as AvatarProps} from './Avatar';
 
@@ -23,6 +30,10 @@ export {
   Props as BannerProps,
   Status as BannerStatus,
 } from './Banner';
+
+export {default as Backdrop, BackdropProps} from './Backdrop';
+
+export {default as Breadcrumbs, Props as BreadcrumbsProps} from './Breadcrumbs';
 
 export {
   default as Button,
@@ -45,22 +56,11 @@ export {default as ChoiceList, Props as ChoiceListProps} from './ChoiceList';
 
 export {default as Collapsible, Props as CollapsibleProps} from './Collapsible';
 
-export {
-  default as ColorPicker,
-  Props as ColorPickerProps,
-  RGBColor,
-  HSBColor,
-  RGBAColor,
-  HSBAColor,
-  rgbToHex,
-  rgbToHsb,
-  hsbToRgb,
-  hsbToHex,
-  rgbString,
-  rgbaString,
-} from './ColorPicker';
+export {default as ColorPicker, Props as ColorPickerProps} from './ColorPicker';
 
 export {default as Connected, Props as ConnectedProps} from './Connected';
+
+export {default as ContextualSaveBar} from './ContextualSaveBar';
 
 export {
   default as DataTable,
@@ -105,13 +105,21 @@ export {
   Props as ExceptionListProps,
 } from './ExceptionList';
 
-export {default as Focus, Props as FocusProps, TrapFocus} from './Focus';
+export {default as Focus, Props as FocusProps} from './Focus';
+
+export {default as TrapFocus, Props as TrapFocusProps} from './TrapFocus';
 
 export {default as FooterHelp, Props as FooterHelpProps} from './FooterHelp';
 
 export {default as Form, Props as FormProps} from './Form';
 
 export {default as FormLayout, Props as FormLayoutProps} from './FormLayout';
+
+export {
+  default as Frame,
+  Props as FrameProps,
+  DEFAULT_TOAST_DURATION,
+} from './Frame';
 
 export {default as Heading, Props as HeadingProps} from './Heading';
 
@@ -138,9 +146,20 @@ export {default as Link, Props as LinkProps} from './Link';
 
 export {default as List, Props as ListProps} from './List';
 
+export {default as Loading, Props as LoadingProps} from './Loading';
+
 export {default as Modal, Props as ModalProps} from './Modal';
 
 export {default as OptionList} from './OptionList';
+
+export {
+  default as Navigation,
+  Props as NavigationProps,
+  ItemProps as NavigationItemProps,
+  MessageProps as NavigationMessageProps,
+  SubNavigationItem,
+  isNavigationItemActive,
+} from './Navigation';
 
 export {default as Page, Props as PageProps} from './Page';
 
@@ -172,7 +191,14 @@ export {
   FilterTextField,
 } from './ResourceList';
 
+export {
+  default as ResourcePicker,
+  Props as ResourcePickerProps,
+} from './ResourcePicker';
+
 export {default as Scrollable, Props as ScrollableProps} from './Scrollable';
+
+export {default as ScrollLock} from './ScrollLock';
 
 export {
   default as Select,
@@ -209,7 +235,17 @@ export {default as TextStyle, Props as TextStyleProps} from './TextStyle';
 
 export {default as Thumbnail, Props as ThumbnailProps} from './Thumbnail';
 
+export {
+  default as ThemeProvider,
+  Props as ThemeProviderProps,
+  Context as ThemeProviderContext,
+} from './ThemeProvider';
+
+export {default as Toast} from './Toast';
+
 export {default as Tooltip, Props as TooltipProps} from './Tooltip';
+
+export {default as TopBar, Props as TopBarProps} from './TopBar';
 
 export {default as Truncate, Props as TruncateProps} from './Truncate';
 
@@ -240,3 +276,9 @@ export {
 } from './SkeletonDisplayText';
 
 export {default as ProgressBar, Props as ProgressBarProps} from './ProgressBar';
+
+export {default as Indicator, Props as IndicatorProps} from './Indicator';
+
+export {default as withContext} from './WithContext';
+
+export {default as withRef, WithRef} from './WithRef';

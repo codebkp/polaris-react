@@ -1,9 +1,9 @@
 import * as React from 'react';
 
+import {ComplexAction} from '../../types';
+import SettingAction from '../SettingAction';
 import {buttonFrom} from '../Button';
 import Card from '../Card';
-import SettingAction from '../SettingAction';
-import {ComplexAction} from '../../types';
 
 export interface Props {
   /** Inner content of the card */

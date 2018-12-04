@@ -35,7 +35,7 @@ Text style enhances text with additional visual meaning. For example, using subd
 
 Text style should be:
 
-- Used when enhancing the text will help the merchant undertand its meaning
+- Used when enhancing the text to help merchants understand its meaning
 - Subdued if the text is less important than its surrounding text
 - Strong for input fields, or for a row total in a price table
 - Paired with symbols, like an arrow or dollar sign, when using positive or negative styles
@@ -46,7 +46,7 @@ Text style should be:
 
 ### Subdued text style
 
-Use to de-emphasize a piece of text that is less important to the merchant than other nearby text. May also be used to indicate when normal content is absent, for example, “No supplier listed”. Don’t use only for aesthetic effect.
+Use to de-emphasize a piece of text that is less important to merchants than other nearby text. May also be used to indicate when normal content is absent, for example, “No supplier listed”. Don’t use only for aesthetic effect.
 
 ```jsx
 <TextStyle variation="subdued">No supplier listed</TextStyle>
@@ -130,7 +130,7 @@ Use to display inline snippets of code or code-like text.
 
 ```jsx
 <p>
-  New URL that visitors should be forwarded to. If you want your store's
+  New URL that visitors should be forwarded to. If you want your store’s
   homepage, enter <TextStyle variation="code"> / </TextStyle> (a forward slash).
 </p>
 ```

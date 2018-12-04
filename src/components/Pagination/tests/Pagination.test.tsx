@@ -1,11 +1,10 @@
 import * as React from 'react';
 import {noop} from '@shopify/javascript-utilities/other';
 import {ReactWrapper} from 'enzyme';
-import {mountWithAppProvider, findByTestID} from '../../../../tests/utilities';
-import {Keys} from '../../../types';
-import Pagination from '../../Pagination';
-import Tooltip from '../../Tooltip';
-import TextField from '../../TextField';
+import {mountWithAppProvider, findByTestID} from 'test-utilities';
+import {Tooltip, TextField} from 'components';
+import {Key} from '../../../types';
+import Pagination from '../Pagination';
 
 interface HandlerMap {
   [eventName: string]: (event: any) => void;
@@ -63,10 +62,10 @@ describe('<Pagination />', () => {
   it('adds a keypress event for nextKeys', () => {
     const spy = jest.fn();
     mountWithAppProvider(
-      <Pagination nextKeys={[Keys.KEY_K]} onNext={spy} nextTooltip="k" />,
+      <Pagination hasNext nextKeys={[Key.KeyK]} onNext={spy} nextTooltip="k" />,
     );
 
-    listenerMap.keyup({keyCode: Keys.KEY_K});
+    listenerMap.keyup({keyCode: Key.KeyK});
 
     expect(spy).toHaveBeenCalledTimes(1);
   });
@@ -75,13 +74,14 @@ describe('<Pagination />', () => {
     const spy = jest.fn();
     mountWithAppProvider(
       <Pagination
-        previousKeys={[Keys.KEY_J]}
+        hasPrevious
+        previousKeys={[Key.KeyJ]}
         onPrevious={spy}
         previousTooltip="j"
       />,
     );
 
-    listenerMap.keyup({keyCode: Keys.KEY_J});
+    listenerMap.keyup({keyCode: Key.KeyJ});
 
     expect(spy).toHaveBeenCalledTimes(1);
   });
@@ -94,14 +94,14 @@ describe('<Pagination />', () => {
           <TextField label="test" value="" onChange={noop} />
           <Pagination
             nextTooltip="j"
-            previousKeys={[Keys.KEY_J]}
+            previousKeys={[Key.KeyJ]}
             onPrevious={spy}
             previousTooltip="j"
           />
         </div>,
       );
       focusElement(wrapper, 'input');
-      listenerMap.keyup({keyCode: Keys.KEY_J});
+      listenerMap.keyup({keyCode: Key.KeyJ});
       expect(spy).not.toHaveBeenCalled();
     });
   });
@@ -128,7 +128,8 @@ describe('<Pagination />', () => {
       const spy = jest.fn();
       pagination = mountWithAppProvider(
         <Pagination
-          previousKeys={[Keys.KEY_J]}
+          hasPrevious
+          previousKeys={[Key.KeyJ]}
           previousTooltip="j"
           previousURL="https://www.google.com"
         />,
@@ -136,9 +137,27 @@ describe('<Pagination />', () => {
 
       const anchor = pagination.find('a').getDOMNode() as HTMLAnchorElement;
       anchor.click = spy;
-      listenerMap.keyup({keyCode: Keys.KEY_J});
+      listenerMap.keyup({keyCode: Key.KeyJ});
 
       expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not navigate the browser when hasNext or hasPrevious is false', () => {
+      const anchorClickSpy = jest.fn();
+      pagination = mountWithAppProvider(
+        <Pagination
+          hasPrevious={false}
+          previousKeys={[Key.KeyJ]}
+          previousTooltip="j"
+          previousURL="https://www.google.com"
+        />,
+      );
+
+      const anchor = pagination.find('a').getDOMNode() as HTMLAnchorElement;
+      anchor.click = anchorClickSpy;
+      listenerMap.keyup({keyCode: Key.KeyJ});
+
+      expect(anchorClickSpy).toHaveBeenCalledTimes(0);
     });
   });
 });

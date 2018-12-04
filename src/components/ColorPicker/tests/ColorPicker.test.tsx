@@ -1,7 +1,7 @@
 import * as React from 'react';
-import {mountWithAppProvider} from '../../../../tests/utilities';
+import {mountWithAppProvider} from 'test-utilities';
+import {Slidable, AlphaPicker} from '../components';
 import ColorPicker from '../ColorPicker';
-import {Slidable} from '../components';
 
 const red = {
   hue: 0,
@@ -9,7 +9,7 @@ const red = {
   brightness: 1,
 };
 
-enum Slidables {
+enum SlidableType {
   BrightnessSaturation,
   Hue,
 }
@@ -21,13 +21,11 @@ describe('<ColorPicker />', () => {
         const spy = jest.fn();
         mountWithAppProvider(<ColorPicker color={red} onChange={spy} />)
           .find(Slidable)
-          .at(Slidables.BrightnessSaturation)
+          .at(SlidableType.BrightnessSaturation)
           .simulate('mousedown');
 
         expect(spy).toHaveBeenCalled();
       });
-
-      it.skip('is called on mousemove when dragging');
 
       it('is not called on mousemove when not dragging', () => {
         const spy = jest.fn();
@@ -45,13 +43,11 @@ describe('<ColorPicker />', () => {
         const spy = jest.fn();
         mountWithAppProvider(<ColorPicker color={red} onChange={spy} />)
           .find(Slidable)
-          .at(Slidables.Hue)
+          .at(SlidableType.Hue)
           .simulate('mousedown');
 
         expect(spy).toHaveBeenCalled();
       });
-
-      it.skip('is called on mousemove when dragging');
 
       it('is not called on mousemove when not dragging', () => {
         const spy = jest.fn();
@@ -71,6 +67,17 @@ describe('<ColorPicker />', () => {
       );
 
       expect(colorPicker.childAt(0).prop('id')).toBe(id);
+    });
+  });
+
+  describe('color', () => {
+    it('is passed down to AlphaPicker if allowAlpha is true', () => {
+      const id = 'MyID';
+      const colorPicker = mountWithAppProvider(
+        <ColorPicker id={id} color={red} onChange={jest.fn()} allowAlpha />,
+      );
+
+      expect(colorPicker.find(AlphaPicker).prop('color')).toEqual(red);
     });
   });
 });

@@ -28,7 +28,7 @@ keywords:
 
 # Collapsible
 
-The collapsible component is used to put long sections of information under a block that can be expanded or collapsed by the merchant.
+The collapsible component is used to put long sections of information under a block that merchants can expand or collapse.
 
 ---
 
@@ -68,7 +68,7 @@ class CollapsibleExample extends React.Component {
       <div style={{height: '200px'}}>
         <Card sectioned>
           <Stack vertical>
-            <Button onClick={this.handleToggleClick} aria-expanded={open}>
+            <Button onClick={this.handleToggleClick} ariaExpanded={open}>
               Toggle
             </Button>
             <Collapsible open={open} id="basic-collapsible">

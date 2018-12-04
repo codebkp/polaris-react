@@ -3,7 +3,10 @@ import * as React from 'react';
 import {autobind, debounce} from '@shopify/javascript-utilities/decorators';
 import {classNames} from '@shopify/react-utilities/styles';
 import {createUniqueIDFactory} from '@shopify/javascript-utilities/other';
-import {Button, EventListener, Sticky, Spinner} from '..';
+import Button from '../Button';
+import EventListener from '../EventListener';
+import Sticky from '../Sticky';
+import Spinner from '../Spinner';
 import {withAppProvider, WithAppProviderProps} from '../AppProvider';
 import Select, {Option} from '../Select';
 import EmptySearchResult from '../EmptySearchResult';
@@ -15,9 +18,10 @@ import {
   CheckableButton,
   FilterControl,
   Item,
+  Provider,
 } from './components';
 
-import {contextTypes, SelectedItems, SELECT_ALL_ITEMS} from './types';
+import {ResourceListContext, SelectedItems, SELECT_ALL_ITEMS} from './types';
 
 import * as styles from './ResourceList.scss';
 
@@ -66,20 +70,6 @@ export interface Props {
   idForItem?(item: any, index: number): string;
 }
 
-export interface Context {
-  selectMode: boolean;
-  selectable?: boolean;
-  selectedItems?: SelectedItems;
-  resourceName?: {
-    singular: string;
-    plural: string;
-  };
-  loading?: boolean;
-  onSelectionChange?(selected: boolean, id: string): void;
-  subscribe(callback: () => void): void;
-  unsubscribe(callback: () => void): void;
-}
-
 export type CombinedProps = Props & WithAppProviderProps;
 
 const getUniqueID = createUniqueIDFactory('Select');
@@ -87,7 +77,6 @@ const getUniqueID = createUniqueIDFactory('Select');
 export class ResourceList extends React.Component<CombinedProps, State> {
   static Item: typeof Item = Item;
   static FilterControl: typeof FilterControl = FilterControl;
-  static childContextTypes = contextTypes;
 
   state: State = {
     selectMode: false,
@@ -95,7 +84,6 @@ export class ResourceList extends React.Component<CombinedProps, State> {
     listNode: null,
   };
 
-  private subscriptions: {(): void}[] = [];
   private defaultResourceName: {singular: string; plural: string};
   private listRef: React.RefObject<HTMLUListElement> = React.createRef();
 
@@ -139,21 +127,28 @@ export class ResourceList extends React.Component<CombinedProps, State> {
   }
 
   @autobind
-  private get itemCountText() {
+  private get headerTitle() {
     const {
       resourceName = this.defaultResourceName,
       items,
       polaris: {intl},
+      loading,
     } = this.props;
 
     const itemsCount = items.length;
     const resource =
-      itemsCount === 1 ? resourceName.singular : resourceName.plural;
+      itemsCount === 1 && !loading
+        ? resourceName.singular
+        : resourceName.plural;
 
-    return intl.translate('Polaris.ResourceList.showing', {
-      itemsCount,
-      resource,
-    });
+    const headerTitleMarkup = loading
+      ? intl.translate('Polaris.ResourceList.loading', {resource})
+      : intl.translate('Polaris.ResourceList.showing', {
+          itemsCount,
+          resource,
+        });
+
+    return headerTitleMarkup;
   }
 
   @autobind
@@ -284,7 +279,7 @@ export class ResourceList extends React.Component<CombinedProps, State> {
     };
   }
 
-  getChildContext(): Context {
+  get getContext(): ResourceListContext {
     const {
       selectedItems,
       resourceName = this.defaultResourceName,
@@ -298,15 +293,13 @@ export class ResourceList extends React.Component<CombinedProps, State> {
       resourceName,
       loading,
       onSelectionChange: this.handleSelectionChange,
-      subscribe: this.subscribe,
-      unsubscribe: this.unsubscribe,
     };
   }
 
+  // eslint-disable-next-line react/no-deprecated
   componentWillReceiveProps(nextProps: Props) {
     const {selectedItems} = this.props;
 
-    this.subscriptions.forEach((subscriberCallback) => subscriberCallback());
     if (
       selectedItems &&
       selectedItems.length > 0 &&
@@ -398,12 +391,9 @@ export class ResourceList extends React.Component<CombinedProps, State> {
         </div>
       ) : null;
 
-    const itemCountTextMarkup = (
-      <div
-        className={styles.ItemCountTextWrapper}
-        testID="ItemCountTextWrapper"
-      >
-        {this.itemCountText}
+    const headerTitleMarkup = (
+      <div className={styles.HeaderTitleWrapper} testID="headerTitleWrapper">
+        {this.headerTitle}
       </div>
     );
 
@@ -424,7 +414,7 @@ export class ResourceList extends React.Component<CombinedProps, State> {
       <div className={styles.CheckableButtonWrapper}>
         <CheckableButton
           accessibilityLabel={this.bulkActionsAccessibilityLabel}
-          label={this.itemCountText}
+          label={this.headerTitle}
           onToggleAll={this.handleToggleAll}
           plain
           disabled={loading}
@@ -440,8 +430,7 @@ export class ResourceList extends React.Component<CombinedProps, State> {
     ) : null;
 
     const headerMarkup = (showHeader || needsHeader) &&
-      listNode &&
-      itemsExist && (
+      listNode && (
         <div className={styles.HeaderOuterWrapper}>
           <Sticky boundingElement={listNode}>
             {(isSticky: boolean) => {
@@ -461,7 +450,7 @@ export class ResourceList extends React.Component<CombinedProps, State> {
                 <div className={headerClassName} testID="ResourceList-Header">
                   {headerWrapperOverlay}
                   <div className={styles.HeaderContentWrapper}>
-                    {itemCountTextMarkup}
+                    {headerTitleMarkup}
                     {checkableButtonMarkup}
                     {sortingSelectMarkup}
                     {selectButtonMarkup}
@@ -475,7 +464,7 @@ export class ResourceList extends React.Component<CombinedProps, State> {
       );
 
     const emptyStateMarkup =
-      filterControl && !itemsExist ? (
+      filterControl && !itemsExist && !loading ? (
         <div className={styles.EmptySearchResultWrapper}>
           <EmptySearchResult {...this.emptySearchResultText} withIllustration />
         </div>
@@ -486,7 +475,7 @@ export class ResourceList extends React.Component<CombinedProps, State> {
       loadingPosition > 0 ? loadingPosition : defaultTopPadding;
     const spinnerStyle = {paddingTop: `${topPadding}px`};
 
-    const spinnerSize = items.length === 1 ? 'small' : 'large';
+    const spinnerSize = items.length < 2 ? 'small' : 'large';
 
     const loadingOverlay = loading ? (
       <React.Fragment>
@@ -496,6 +485,17 @@ export class ResourceList extends React.Component<CombinedProps, State> {
         <div className={styles.LoadingOverlay} />
       </React.Fragment>
     ) : null;
+
+    const className = classNames(
+      styles.ItemWrapper,
+      loading && styles['ItemWrapper-isLoading'],
+    );
+    const loadingWithoutItemsMarkup =
+      loading && !itemsExist ? (
+        <div className={className} tabIndex={-1}>
+          {loadingOverlay}
+        </div>
+      ) : null;
 
     const resourceListClassName = classNames(
       styles.ResourceList,
@@ -517,23 +517,14 @@ export class ResourceList extends React.Component<CombinedProps, State> {
     );
 
     return (
-      <div className={styles.ResourceListWrapper}>
-        {filterControlMarkup}
-        {headerMarkup}
-        {listMarkup}
-      </div>
-    );
-  }
-
-  @autobind
-  subscribe(callback: () => void) {
-    this.subscriptions.push(callback);
-  }
-
-  @autobind
-  unsubscribe(callback: () => void) {
-    this.subscriptions = this.subscriptions.filter(
-      (subscription) => subscription !== callback,
+      <Provider value={this.getContext}>
+        <div className={styles.ResourceListWrapper}>
+          {filterControlMarkup}
+          {headerMarkup}
+          {listMarkup}
+          {loadingWithoutItemsMarkup}
+        </div>
+      </Provider>
     );
   }
 

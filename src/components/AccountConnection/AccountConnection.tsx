@@ -4,9 +4,9 @@ import {Action} from '../../types';
 import Avatar from '../Avatar';
 import {buttonFrom} from '../Button';
 import Card from '../Card';
-import SettingAction from '../SettingAction';
 import Stack from '../Stack';
 import TextStyle from '../TextStyle';
+import SettingAction from '../SettingAction';
 
 import * as styles from './AccountConnection.scss';
 
@@ -35,7 +35,7 @@ export default function AccountConnection({
   title,
   details,
   termsOfService,
-}: Props): React.ReactNode {
+}: Props) {
   const initials = accountName
     ? accountName
         .split(/\s+/)

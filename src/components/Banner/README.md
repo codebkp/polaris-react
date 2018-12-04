@@ -31,7 +31,7 @@ keywords:
 
 # Banner
 
-Informs merchants about important changes or persistent conditions. Use this component if you need to communicate to merchants in a prominent way. Banners show at the top of the page or section they apply to.
+Informs merchants about important changes or persistent conditions. Use this component if you need to communicate to merchants in a prominent way. Banners are placed at the top of the page or section they apply to, and below the page or section header.
 
 ---
 
@@ -40,21 +40,20 @@ Informs merchants about important changes or persistent conditions. Use this com
 Banners should:
 
 - Be placed in the appropriate context:
-  - Banners relevant to an entire page should show at the top of that page at
-    full-width.
-  - Banners related to a specific section or element of a page (such as a card,
-    popover, or modal) should show inside of that element.
+  - Banners relevant to an entire page should be placed at the top of that page, below the page header. They should occupy the full width of the content area.
+  - Banners related to a section of a page (like a card,
+    popover, or modal) should be placed inside that section, below any section heading.
+  - Banners related to an element more specific that a section should be placed immediately above or below that element.
 - Focus on a single theme, piece of information, or required action to avoid
   overwhelming merchants.
-- Be dismissible unless they contain critical information or an important step
-  a merchant needs to take.
+- Be dismissible unless they contain critical information or an important step merchants need to take.
 - Be concise and scannable—merchants shouldn’t need to spend a lot of time
   figuring out what they need to know and do.
 - Be limited to a few important calls to action with no more than one primary
   action.
 - Be used thoughtfully and sparingly for only the most important information.
-- Not be used as the primary entry point or mechanism to access information or
-  actions a merchant needs to take on a regular basis.
+- Not be used as the primary entry point to information or
+  actions merchants need on a regular basis.
 - Not be used for marketing information or upsell—[use callout cards](/components/structure/callout-card) instead.
 - Use the default icon for `success`, `info`, `warning` and `critical` statuses. If the icon is changed, use only [major, duotone icons](/design/icons#using-icons-in-your-designs).
 
@@ -70,7 +69,7 @@ Banner headings should be:
   - Communicate when a situation is serious enough to warrant using a critical or
     warning banner. People who are unable to see the color of the banner need to
     clearly understand the importance of the situation without the benefit of
-    seeing the color of the banner. Learn more about [accessibility](/guides/accessibility).
+    seeing the color of the banner. Learn more about [accessibility](/patterns-and-guides/accessibility).
 
 <!-- usagelist -->
 
@@ -139,7 +138,7 @@ of 20 themes. To add more themes, delete themes you’re no longer using.
 Buttons and links should be:
 
 - Clear and predictable: merchants should be able to anticipate what will
-  happen when they click a button. Never deceive a merchant by mislabeling a
+  happen when they click a button. Never deceive merchants by mislabeling a
   button.
 
 <!-- usagelist -->
@@ -186,7 +185,7 @@ Add a menu item
 
 Link text should:
 
-- Set the expectation of where the merchant will be taken
+- Set the expectation of where merchants will be taken
 
 <!-- usagelist -->
 
@@ -219,7 +218,7 @@ Finance section
 
 Body content should be:
 
-- Actionable: start sentences with imperative verbs when telling a merchant
+- Actionable: start sentences with imperative verbs when telling merchants
   what actions are available to them (especially something new). Don’t use
   permissive language like “you can”.
 
@@ -260,12 +259,11 @@ including packaging.
 
 ### Default banners
 
-- Use to convey general information or actions that aren’t critical
-- For example, you might show a banner that asks for merchant feedback
-- Default banners contain lower priority information and should always be dismissible
+- Use to convey general information or actions that aren’t critical. For example, you might show a banner that asks for merchant feedback.
+- Default banners contain lower priority information and should always be dismissible.
 
 ```jsx
-<Banner title="Order archived">
+<Banner title="Order archived" onDismiss={() => {}}>
   <p>This order was archived on March 7, 2017 at 3:12pm EDT.</p>
 </Banner>
 ```
@@ -286,7 +284,7 @@ including packaging.
 
 <!-- example-for: web -->
 
-Make all banners dismissible, unless they contain critical information or an important action that a merchant is required to take.
+Make all banners dismissible, unless they contain critical information or an important action that merchants are required to take.
 
 ```jsx
 <Banner onDismiss={() => {}}>
@@ -306,6 +304,7 @@ Use when you want merchants to take an action after reading the banner.
   title="Some of your product variants are missing weights"
   status="warning"
   action={{content: 'Edit variant weights'}}
+  onDismiss={() => {}}
 >
   <p>
     Add weights to show accurate rates at checkout and when buying shipping
@@ -335,6 +334,7 @@ Use to update merchants about a change or give them advice.
   title="USPS has updated their rates"
   action={{content: 'Learn more'}}
   status="info"
+  onDismiss={() => {}}
 >
   <p>Make sure you know how these changes affect your store.</p>
 </Banner>
@@ -362,6 +362,7 @@ Use to update merchants about a change or give them advice.
   title="Your shipping label is ready to print."
   status="success"
   action={{content: 'Print label'}}
+  onDismiss={() => {}}
 />
 ```
 
@@ -379,7 +380,7 @@ Use to update merchants about a change or give them advice.
 
 ### Warning banners
 
-- Use to display information that needs attention or that the merchant needs to take action on
+- Use to display information that needs attention or that merchants need to take action on
 - Seeing these banners can be stressful for merchants so be cautious about using them
 
 ```jsx
@@ -445,7 +446,7 @@ Use to update merchants about a change or give them advice.
 
 <!-- example-for: web -->
 
-Banners inside of modals render with less spacing and a paired-back design to fit within a content context.
+Banners inside of modals render with less spacing and a pared-back design to fit within a content context.
 
 ```jsx
 class ModalExample extends React.Component {
@@ -503,7 +504,7 @@ class ModalExample extends React.Component {
 
 <!-- example-for: web -->
 
-Banners inside of cards render with less spacing and a paired-back design to fit within a content context.
+Banners inside of cards render with less spacing and a pared-back design to fit within a content context.
 
 ```jsx
 <Card title="Online store dashboard" sectioned>

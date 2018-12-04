@@ -6,6 +6,7 @@ import * as styles from './Badge.scss';
 
 export type Status = 'success' | 'info' | 'attention' | 'warning' | 'new';
 export type Progress = 'incomplete' | 'partiallyComplete' | 'complete';
+export type Size = 'small' | 'medium';
 
 export interface Props {
   /** The content to display inside the badge. */
@@ -14,17 +15,22 @@ export interface Props {
   status?: Status;
   /** Render a pip showing the progress of a given task. */
   progress?: Progress;
+  /**
+   * Medium or small size. Use `small` only in the main navigation of an app frame.
+   * @default 'medium'
+   */
+  size?: Size;
 }
 
 export type CombinedProps = Props & WithAppProviderProps;
 
-const PROGRESS_LABELS = {
+export const PROGRESS_LABELS: {[key in Progress]: Progress} = {
   incomplete: 'incomplete',
   partiallyComplete: 'partiallyComplete',
   complete: 'complete',
 };
 
-const STATUS_LABELS = {
+export const STATUS_LABELS: {[key in Status]: Status} = {
   info: 'info',
   success: 'success',
   warning: 'warning',
@@ -32,11 +38,20 @@ const STATUS_LABELS = {
   new: 'new',
 };
 
-function Badge({children, status, progress, polaris: {intl}}: CombinedProps) {
+const DEFAULT_SIZE = 'medium';
+
+function Badge({
+  children,
+  status,
+  progress,
+  size = DEFAULT_SIZE,
+  polaris: {intl},
+}: CombinedProps) {
   const className = classNames(
     styles.Badge,
     status && styles[variationName('status', status)],
     progress && styles[variationName('progress', progress)],
+    size && size !== DEFAULT_SIZE && styles[variationName('size', size)],
   );
 
   let progressMarkup;
@@ -75,6 +90,9 @@ function Badge({children, status, progress, polaris: {intl}}: CombinedProps) {
       break;
     case STATUS_LABELS.attention:
       statusMarkup = intl.translate('Polaris.Badge.STATUS_LABELS.attention');
+      break;
+    case STATUS_LABELS.new:
+      statusMarkup = intl.translate('Polaris.Badge.STATUS_LABELS.new');
       break;
   }
 

@@ -1,5 +1,6 @@
 $height: rem(20px);
-$horizontal-padding: ($height / 2);
+$small-height: rem(18px);
+$horizontal-padding: spacing(tight);
 
 $pip-size: rem(10px);
 $pip-spacing: ($height - $pip-size) / 2;
@@ -21,6 +22,11 @@ $pip-spacing: ($height - $pip-size) / 2;
   font-size: rem(13px);
   line-height: $height;
   color: color('ink', 'light');
+}
+
+.sizeSmall {
+  font-size: font-size(caption, large-screen);
+  line-height: $small-height;
 }
 
 .statusSuccess {
@@ -48,11 +54,9 @@ $pip-spacing: ($height - $pip-size) / 2;
 }
 
 .statusNew {
-  background: color('teal');
-  color: color('white');
-  border-radius: rem(10px);
-  border: none;
-  padding: 0 spacing(tight);
+  background-color: color('sky', 'dark');
+  color: color('ink');
+  font-weight: 500;
 }
 
 .progressIncomplete .Pip {

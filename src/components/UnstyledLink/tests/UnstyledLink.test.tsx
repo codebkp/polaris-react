@@ -1,12 +1,7 @@
 import * as React from 'react';
+import Link from 'components/AppProvider/utilities/Link';
+import {mountWithAppProvider} from 'test-utilities';
 import UnstyledLink from '../UnstyledLink';
-import {
-  shallowWithAppProvider,
-  mountWithAppProvider,
-} from '../../../../tests/utilities';
-
-// eslint-disable-next-line shopify/strict-component-boundaries
-import Link from '../../AppProvider/Link';
 
 describe('<UnstyledLink />', () => {
   describe('custom link component', () => {
@@ -19,7 +14,7 @@ describe('<UnstyledLink />', () => {
         mockContext,
       ).find(CustomLinkComponent);
 
-      expect(anchorElement.length).toBe(1);
+      expect(anchorElement).toHaveLength(1);
     });
 
     it('doesn’t have polaris prop', () => {
@@ -37,7 +32,7 @@ describe('<UnstyledLink />', () => {
 
   describe('external', () => {
     it('adds the correct attributes', () => {
-      const anchorElement = shallowWithAppProvider(
+      const anchorElement = mountWithAppProvider(
         <UnstyledLink external url="https://shopify.com" />,
       ).find('a');
       expect(anchorElement.prop('target')).toBe('_blank');

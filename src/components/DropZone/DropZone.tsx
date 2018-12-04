@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as PropTypes from 'prop-types';
 import capitalize from 'lodash/capitalize';
 import {createUniqueIDFactory} from '@shopify/javascript-utilities/other';
 import {classNames} from '@shopify/react-utilities/styles';
@@ -17,7 +16,7 @@ import VisuallyHidden from '../VisuallyHidden';
 import Labelled, {Action} from '../Labelled';
 import {withAppProvider, WithAppProviderProps} from '../AppProvider';
 
-import {FileUpload} from './components';
+import {FileUpload, Provider} from './components';
 
 import IconDragDrop from './icons/drag-drop.svg';
 import IconAlertCircle from './icons/alert-circle.svg';
@@ -37,6 +36,7 @@ export interface State {
   dragging: boolean;
   overlayText?: string;
   errorOverlayText?: string;
+  numFiles: number;
 }
 
 export interface Props {
@@ -112,10 +112,6 @@ const getUniqueID = createUniqueIDFactory('DropZone');
 
 export class DropZone extends React.Component<CombinedProps, State> {
   public static FileUpload: typeof FileUpload = FileUpload;
-  public static childContextTypes = {
-    size: PropTypes.string,
-    type: PropTypes.string,
-  };
   public static defaultProps: Partial<CombinedProps> = {
     type: 'file',
     outline: true,
@@ -156,8 +152,6 @@ export class DropZone extends React.Component<CombinedProps, State> {
     return Object.keys(newState).length ? newState : null;
   }
 
-  context: Partial<DropZoneContext>;
-
   private node: HTMLElement | null = null;
   private dropNode: HTMLElement | HTMLDocument | null = null;
   private dragTargets: EventTarget[] = [];
@@ -182,10 +176,11 @@ export class DropZone extends React.Component<CombinedProps, State> {
       error: false,
       overlayText: translate(`Polaris.DropZone.overlayText${suffix}`),
       errorOverlayText: translate(`Polaris.DropZone.errorOverlayText${suffix}`),
+      numFiles: 0,
     };
   }
 
-  getChildContext(): DropZoneContext {
+  get getContext(): DropZoneContext {
     return {
       size: this.state.size,
       type: this.state.type || 'file',
@@ -264,7 +259,7 @@ export class DropZone extends React.Component<CombinedProps, State> {
               </DisplayText>
             )}
             {(size === 'medium' || size === 'large') && (
-              <Caption>{overlayText}</Caption>
+              <Caption>{errorOverlayText}</Caption>
             )}
           </Stack>
         </div>
@@ -287,7 +282,7 @@ export class DropZone extends React.Component<CombinedProps, State> {
       </div>
     );
 
-    return label ? (
+    const labelledDropzoneMarkup = label ? (
       <Labelled
         id={id}
         label={label}
@@ -299,11 +294,15 @@ export class DropZone extends React.Component<CombinedProps, State> {
     ) : (
       dropZoneMarkup
     );
+
+    return (
+      <Provider value={this.getContext}>{labelledDropzoneMarkup}</Provider>
+    );
   }
 
   componentDidMount() {
     this.dragTargets = [];
-    // eslint-disable-next-line react/no-did-mount-set-state
+
     this.setState({error: this.props.error});
 
     if (!this.dropNode) {
@@ -425,9 +424,10 @@ export class DropZone extends React.Component<CombinedProps, State> {
 
   @autobind
   private handleClick(event: React.MouseEvent<HTMLElement>) {
-    const {onClick, disabled} = this.props;
+    const {numFiles} = this.state;
+    const {onClick, disabled, allowMultiple} = this.props;
 
-    if (disabled) {
+    if (disabled || (!allowMultiple && numFiles > 0)) {
       return;
     }
 
@@ -439,9 +439,16 @@ export class DropZone extends React.Component<CombinedProps, State> {
     event.preventDefault();
     event.stopPropagation();
 
-    const {disabled, onDrop, onDropAccepted, onDropRejected} = this.props;
+    const {
+      disabled,
+      onDrop,
+      onDropAccepted,
+      onDropRejected,
+      allowMultiple,
+    } = this.props;
+    const {numFiles} = this.state;
 
-    if (disabled) {
+    if (disabled || (!allowMultiple && numFiles > 0)) {
       return;
     }
 
@@ -453,7 +460,11 @@ export class DropZone extends React.Component<CombinedProps, State> {
 
     this.dragTargets = [];
 
-    this.setState({dragging: false, error: rejectedFiles.length > 0});
+    this.setState((prev) => ({
+      dragging: false,
+      error: rejectedFiles.length > 0,
+      numFiles: prev.numFiles + acceptedFiles.length,
+    }));
 
     if (onDrop) {
       onDrop(files as File[], acceptedFiles, rejectedFiles);
@@ -473,10 +484,10 @@ export class DropZone extends React.Component<CombinedProps, State> {
     event.preventDefault();
     event.stopPropagation();
 
-    const {dragging} = this.state;
-    const {disabled, onDragEnter} = this.props;
+    const {dragging, numFiles} = this.state;
+    const {disabled, onDragEnter, allowMultiple} = this.props;
 
-    if (disabled) {
+    if (disabled || (!allowMultiple && numFiles > 0)) {
       return;
     }
 
@@ -504,9 +515,10 @@ export class DropZone extends React.Component<CombinedProps, State> {
     event.preventDefault();
     event.stopPropagation();
 
-    const {disabled, onDragOver} = this.props;
+    const {numFiles} = this.state;
+    const {disabled, onDragOver, allowMultiple} = this.props;
 
-    if (disabled) {
+    if (disabled || (!allowMultiple && numFiles > 0)) {
       return;
     }
 
@@ -521,9 +533,10 @@ export class DropZone extends React.Component<CombinedProps, State> {
   private handleDragLeave(event: DragEvent) {
     event.preventDefault();
 
-    const {disabled, onDragLeave} = this.props;
+    const {numFiles} = this.state;
+    const {disabled, onDragLeave, allowMultiple} = this.props;
 
-    if (disabled) {
+    if (disabled || (!allowMultiple && numFiles > 0)) {
       return;
     }
 

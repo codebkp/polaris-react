@@ -1,5 +1,7 @@
 @import './variables';
 
+$item-wrapper-loading-height: rem(64px);
+
 @mixin disabled-pointer-events {
   pointer-events: none;
 }
@@ -122,7 +124,7 @@
   }
 }
 
-.ItemCountTextWrapper {
+.HeaderTitleWrapper {
   white-space: nowrap;
   text-overflow: ellipsis;
   flex: 1;
@@ -198,12 +200,18 @@
 }
 
 .ItemWrapper {
-  max-width: 100%;
+  position: relative;
+  z-index: resource-list(list-stacking-order);
   overflow: hidden;
+  max-width: 100%;
 
   + .ItemWrapper {
     border-top: border();
   }
+}
+
+.ItemWrapper-isLoading {
+  min-height: $item-wrapper-loading-height;
 }
 
 .SpinnerContainer {
@@ -215,7 +223,7 @@
 
 .LoadingOverlay {
   @include resource-list-overlay;
-  z-index: resource-list(list-stacking-order);
+  z-index: resource-list(overlay-stacking-order);
   display: flex;
   justify-content: center;
   background-color: resource-list(overlay-background);

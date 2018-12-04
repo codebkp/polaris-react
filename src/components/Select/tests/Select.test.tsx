@@ -1,13 +1,9 @@
 import * as React from 'react';
 import {ShallowWrapper} from 'enzyme';
 import {noop} from '@shopify/javascript-utilities/other';
-import {
-  shallowWithAppProvider,
-  mountWithAppProvider,
-} from '../../../../tests/utilities';
-
-import InlineError from '../../InlineError';
-import Select from '../../Select';
+import {InlineError} from 'components';
+import {shallowWithAppProvider, mountWithAppProvider} from 'test-utilities';
+import Select from '../Select';
 
 describe('<Select />', () => {
   describe('onChange()', () => {
@@ -132,6 +128,8 @@ describe('<Select />', () => {
       }
     }
 
+    // Expectations are ran within the call to testOptions()
+    // eslint-disable-next-line jest/expect-expect
     it('translates grouped options into optgroup tags', () => {
       const optionOrOptgroupElements = shallowWithAppProvider(
         <Select label="Select" options={optionsAndGroups} />,
@@ -145,6 +143,8 @@ describe('<Select />', () => {
       });
     });
 
+    // Expectations are ran within the call to testOptions()
+    // eslint-disable-next-line jest/expect-expect
     it('translates legacy groups into optgroup tags', () => {
       const optionOrOptgroupElements = shallowWithAppProvider(
         <Select label="Select" groups={optionsAndGroups} />,
@@ -312,7 +312,7 @@ describe('<Select />', () => {
         .find('select')
         .prop<string>('aria-describedby')
         .split(' ');
-      expect(descriptions.length).toBe(2);
+      expect(descriptions).toHaveLength(2);
       expect(select.find(`#${descriptions[0]}`).text()).toBe('Some help');
       expect(select.find(`#${descriptions[1]}`).text()).toBe('Some error');
     });

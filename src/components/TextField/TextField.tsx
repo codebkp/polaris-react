@@ -6,8 +6,8 @@ import {classNames} from '@shopify/react-utilities/styles';
 import Labelled, {Action, helpTextID, labelID} from '../Labelled';
 import Connected from '../Connected';
 
+import {Error, Key} from '../../types';
 import {Resizer, Spinner} from './components';
-import {Error, Keys} from '../../types';
 import * as styles from './TextField.scss';
 
 export type Type =
@@ -92,7 +92,7 @@ export interface BaseProps {
   ariaOwns?: string;
   /** Indicates the id of a component controlled by the input */
   ariaControls?: string;
-  /** Indicates the id of a related component's visually focused element ot the input */
+  /** Indicates the id of a related component’s visually focused element to the input */
   ariaActiveDescendant?: string;
   /** Indicates what kind of user input completion suggestions are provided */
   ariaAutocomplete?: string;
@@ -115,6 +115,10 @@ export type Props = NonMutuallyExclusiveProps &
 const getUniqueID = createUniqueIDFactory('TextField');
 
 export default class TextField extends React.PureComponent<Props, State> {
+  static getDerivedStateFromProps(nextProps: Props, prevState: State) {
+    return {id: nextProps.id || prevState.id};
+  }
+
   private input: HTMLElement;
 
   constructor(props: Props) {
@@ -135,12 +139,6 @@ export default class TextField extends React.PureComponent<Props, State> {
     ) {
       this.input.focus();
     }
-  }
-
-  componentWillReceiveProps(newProps: Props) {
-    this.setState({
-      id: newProps.id || this.state.id,
-    });
   }
 
   render() {
@@ -352,7 +350,7 @@ export default class TextField extends React.PureComponent<Props, State> {
     const {type} = this.props;
     const numbersSpec = /[\d.eE+-]$/;
 
-    if (type !== 'number' || which === Keys.ENTER || key.match(numbersSpec)) {
+    if (type !== 'number' || which === Key.Enter || key.match(numbersSpec)) {
       return;
     }
 
@@ -388,5 +386,5 @@ function normalizeAutoComplete(autoComplete?: boolean) {
   if (autoComplete == null) {
     return autoComplete;
   }
-  return autoComplete ? 'on' : 'off';
+  return autoComplete ? 'on' : 'nope';
 }

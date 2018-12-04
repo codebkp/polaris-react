@@ -24,6 +24,7 @@ keywords:
   - page actions
   - page layouts
   - easdk
+  - shopify app bridge
   - embedded app
   - android
   - ios
@@ -35,7 +36,50 @@ Use to build the outer wrapper of a page, including the page title and associate
 
 ---
 
-## Best Practices
+## Use in an embedded application
+
+Passing an API key to the [app provider component](https://polaris.shopify.com/components/structure/app-provider#section-initializing-the-shopify-app-bridge) causes the page component to delegate to the [Shopify App Bridge](https://help.shopify.com/en/api/embedded-apps/app-bridge) instead of rendering as it would in a stand-alone application.
+
+Note in the props table that a number of properties are only available in stand-alone applications, and won't work in an embedded context. Configure your application's icon and navigation in the [Shopify Partner Dashboard](https://partners.shopify.com) app setup section. To help visualize the page component in an embedded application, we've provided the following screenshot.
+
+![Screenshot of page component in an embedded application](embedded/page/page.jpg)
+
+```jsx
+ReactDOM.render(
+  <AppProvider apiKey="YOUR_API_KEY">
+    <Page
+      breadcrumbs={[{content: 'Products'}]}
+      title="Product reviews"
+      primaryAction={{
+        content: 'Save',
+        disabled: true,
+      }}
+      secondaryActions={[{content: 'Duplicate'}, {content: 'Upgrade'}]}
+      actionGroups={[
+        {
+          title: 'Promote',
+          actions: [
+            {
+              content: 'Share on Facebook',
+              onAction: this.performFacebookShare,
+            },
+            {
+              content: 'Share on Pinterest',
+              onAction: this.performPinterestShare,
+            },
+          ],
+        },
+      ]}
+    >
+      <p>Page content</p>
+    </Page>
+  </AppProvider>,
+);
+```
+
+---
+
+## Best practices
 
 The page component should:
 
@@ -73,7 +117,7 @@ The content of each breadcrumb link should be the title of the page to which it 
 Page header action labels should be:
 
 - Clear and predictable: merchants should be able to anticipate what will
-  happen when they click a page action. Never deceive a merchant by mislabeling an action.
+  happen when they click a page action. Never deceive merchants by mislabeling an action.
 
 - Action-led: they should always lead with a strong verb that encourages
   action. To provide enough context to merchants, use the {verb}+{noun} format.
@@ -266,7 +310,7 @@ Use for layouts that benefit from more screen width, such as wide tables or list
 
 <!-- example-for: web -->
 
-Use a single column layout if the page supports a single unified task. When the merchant must review the entire page contents to complete their goal, this layout helps focus their attention in a single path from top to bottom.
+Use a single column layout if the page supports a single unified task. When merchants must review the entire page contents to complete their goal, this layout helps focus their attention in a single path from top to bottom.
 
 ```jsx
 <Page
@@ -297,9 +341,7 @@ Use action groups for sets of actions that relate to one another, particularly w
   actionGroups={[
     {
       title: 'Promote',
-      actions: [
-        {content: 'Share on Facebook', onAction: this.performFacebookShare},
-      ],
+      actions: [{content: 'Share on Facebook', onAction: () => {}}],
     },
   ]}
 >
@@ -350,4 +392,4 @@ Title metadata appears immediately after the page’s title. Use it to communica
 ## Related components
 
 - To lay out the content within a page, [use the layout component](/components/structure/layout)
-- When using `Page` within an [embedded app](https://github.com/Shopify/polaris/blob/master/documentation/Embedded%20apps.md), rendering is delegated to the Embedded App SDK
+- When using `Page` within an [embedded app](https://github.com/Shopify/polaris-react/blob/master/documentation/Embedded%20apps.md), rendering is delegated to the Shopify App Bridge

@@ -33,7 +33,7 @@ Select lets merchants choose one option from an options menu. Consider select wh
 
 ---
 
-## Best Practices
+## Best practices
 
 The select component should:
 
@@ -52,7 +52,7 @@ Labels should:
 - Give a short description (1–3 words) of the requested input.
 - Be written in sentence case (the first word capitalized, the rest lowercase).
 - Avoid punctuation and articles (“the”, “an”, “a”).
-- Be independent sentences. To support [internationalization](/guides/internationalization), they should not act as the first part of a sentence that is finished by the component’s options.
+- Be independent sentences. To support [internationalization](/patterns-and-guides/internationalization), they should not act as the first part of a sentence that is finished by the component’s options.
 - Be descriptive, not instructional. If the selection needs more explanation, use help text below the field.
 
 <!-- usagelist -->
@@ -96,7 +96,7 @@ Options should:
 
 <!-- content-for: web -->
 
-Presents a classic dropdown menu or equivalent picker as determined by the merchant’s browser.
+Presents a classic dropdown menu or equivalent picker as determined by merchants’ browsers.
 
 ```jsx
 class SelectExample extends React.Component {

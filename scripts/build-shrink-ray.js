@@ -3,16 +3,16 @@
 require('isomorphic-fetch');
 
 const {resolve} = require('path');
-const {existsSync, readFileSync} = require('fs-extra');
 const {execSync} = require('child_process');
+const {existsSync, readFileSync} = require('fs-extra');
 
 const BASE_BRANCH = 'master';
 const repo = 'polaris-react';
-const sha = process.env.CIRCLE_SHA1; // eslint-disable-line no-process-env
+const sha = process.env.CIRCLE_SHA1;
 
 const postWebpackReportURL = `https://shrink-ray.shopifycloud.com/repos/${repo}/commits/${sha}/reports`;
 
-const build = resolve(__dirname, '..', 'shrink-ray-build/build');
+const build = resolve(__dirname, '..', 'playground/build');
 const report = resolve(build, 'bundle-analysis', 'report.html');
 
 process.on('unhandledRejection', (reason) => {
@@ -25,13 +25,16 @@ if (sha) {
   console.log(
     'sha is not available, building bundle without pinging shrink-ray',
   );
-  buildPackages(false);
+  buildPackages();
 }
 
-function buildPackages(includeReport) {
-  execSync('yarn run webpack --config shrink-ray-build/webpack.config.js', {
-    stdio: 'inherit',
-  });
+function buildPackages() {
+  execSync(
+    'yarn run webpack --config playground/webpack.config.js --env.production',
+    {
+      stdio: 'inherit',
+    },
+  );
 }
 
 function setupShrinkRay() {
@@ -41,7 +44,7 @@ function setupShrinkRay() {
       console.log(`[shrink-ray] status: ${response.status}`);
       console.log(`[shrink-ray] statusText: ${response.statusText}`);
       console.log('[shrink-ray] shrink-ray prebuild script completed.');
-      buildPackages(true);
+      buildPackages();
       return postReportToShrinkRay();
     })
     .then((response) => {

@@ -1,44 +1,120 @@
 const path = require('path');
-const webpack = require('webpack');
 const {
   svgOptions: svgOptimizationOptions,
 } = require('@shopify/images/optimize');
 const postcssShopify = require('postcss-shopify');
 
+// Use the version of webpack-bundle-analyzer (and other plugins/loaders) from
+// sewing-kit in order avoid a bunch of duplication in our devDependencies
+// eslint-disable-next-line node/no-extraneous-require, import/no-extraneous-dependencies
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+  .BundleAnalyzerPlugin;
+
 const ICON_PATH_REGEX = /icons\//;
 const IMAGE_PATH_REGEX = /\.(jpe?g|png|gif|svg)$/;
 
-module.exports = {
+module.exports = (env = {production: false}) => ({
   target: 'web',
-  devtool: 'eval',
+  mode: env.production ? 'production' : 'development',
+  devtool: env.production ? 'source-map' : 'eval',
+  stats: {
+    // When transpiling TS using isolatedModules, the compiler doesn't strip
+    // out exported types as it doesn't know if an item is a type or not.
+    // Ignore those warnings as we don't care about them.
+    warningsFilter: /export .* was not found in/,
+  },
   devServer: {
-    // eslint-disable-next-line no-process-env
     port: process.env.PORT || 8080,
     disableHostCheck: true,
+    historyApiFallback: true,
+    stats: {
+      // When transpiling TS using isolatedModules, the compiler doesn't strip
+      // out exported types as it doesn't know if an item is a type or not.
+      // Ignore those warnings as we don't care about them.
+      warningsFilter: /export .* was not found in/,
+    },
   },
   entry: [
     'react-hot-loader/patch',
     '@shopify/polaris/styles/global.scss',
-    path.join(__dirname, 'index.tsx'),
+    path.join(__dirname, 'client/index.ts'),
   ],
   output: {
     filename: '[name].js',
+    path: path.resolve(__dirname, 'build/assets'),
     publicPath: '/assets/',
-    libraryTarget: 'var',
+  },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all',
+          priority: -20,
+        },
+        polaris: {
+          // Include polaris code files, but not markdown files
+          // We don't want to include the readme samples in here
+          test: (module) => {
+            const name = module.nameForCondition && module.nameForCondition();
+            const polarisDir = path.resolve(__dirname, '..', 'src');
+
+            return name && name.startsWith(polarisDir) && !name.endsWith('.md');
+          },
+          name: 'polaris',
+          priority: -15,
+          chunks: 'all',
+        },
+      },
+    },
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.json'],
+    modules: ['node_modules', path.resolve(__dirname, '..', 'src')],
     alias: {
       '@shopify/polaris': path.resolve(__dirname, '..', 'src'),
     },
   },
-  plugins: [
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('development'),
-    }),
-  ],
+  plugins: env.production
+    ? [
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'static',
+          reportFilename: path.resolve(
+            __dirname,
+            'build/bundle-analysis/report.html',
+          ),
+          generateStatsFile: true,
+          statsFilename: path.resolve(
+            __dirname,
+            'build/bundle-analysis/stats.json',
+          ),
+          openAnalyzer: false,
+        }),
+      ]
+    : [],
   module: {
-    loaders: [
+    rules: [
+      {
+        test: /\.md$/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              babelrc: false,
+              minified: Boolean(env.production),
+              presets: [
+                ['shopify/web', {modules: false}],
+                ['shopify/react', {hot: true}],
+              ],
+              cacheDirectory: path.resolve(__dirname, 'build/cache/markdown'),
+            },
+          },
+          {
+            loader: `${__dirname}/webpack/parseMarkdown.js`,
+          },
+        ],
+      },
       {
         test(resource) {
           return ICON_PATH_REGEX.test(resource) && resource.endsWith('.svg');
@@ -66,7 +142,6 @@ module.exports = {
             loader: 'url-loader',
             options: {
               limit: 10000,
-              emitFile: true,
             },
           },
         ],
@@ -75,21 +150,23 @@ module.exports = {
         test: /\.tsx?$/,
         use: [
           {
-            loader: 'awesome-typescript-loader',
+            loader: 'babel-loader',
+            options: {
+              babelrc: false,
+              minified: Boolean(env.production),
+              presets: [
+                ['shopify/web', {modules: false}],
+                ['shopify/react', {hot: true}],
+              ],
+              cacheDirectory: path.resolve(__dirname, 'build/cache/typescript'),
+            },
+          },
+          {
+            loader: 'ts-loader',
             options: {
               silent: true,
-              useBabel: true,
-              useCache: true,
-              useTranspileModule: true,
               transpileOnly: true,
-              cacheDirectory: path.resolve(__dirname, '.cache', 'typescript'),
-              babelOptions: {
-                babelrc: false,
-                presets: [
-                  ['shopify/web', {modules: false}],
-                  ['shopify/react', {hot: true}],
-                ],
-              },
+              experimentalFileCaching: true,
             },
           },
         ],
@@ -142,4 +219,4 @@ module.exports = {
       },
     ],
   },
-};
+});

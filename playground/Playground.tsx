@@ -1,18 +1,17 @@
-/* eslint-disable */
-
 import * as React from 'react';
-import {Page, AppProvider} from '@shopify/polaris';
+import {Page} from '@shopify/polaris';
 
 interface State {}
 
-export default class Playground extends React.Component<never, State> {
+export default class Playground extends React.Component<{}, State> {
   render() {
     return (
-      <AppProvider>
-        <Page title="Playground" />
-      </AppProvider>
+      <Page
+        title="Playground"
+        primaryAction={{content: 'View Examples', url: '/examples'}}
+      >
+        {/* Add the code you want to test here */}
+      </Page>
     );
   }
 }
-
-/* eslint-enable */

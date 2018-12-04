@@ -1,10 +1,6 @@
 import * as React from 'react';
-import {mountWithAppProvider} from '../../../../tests/utilities';
-
-import InlineError from '../../InlineError';
-import Label from '../../Label';
-import {buttonFrom} from '../../Button';
-import Labelled from '../../Labelled';
+import {InlineError, Label, buttonFrom, Labelled} from 'components';
+import {mountWithAppProvider} from 'test-utilities';
 
 describe('<Labelled />', () => {
   it('passes relevant props along to the label', () => {

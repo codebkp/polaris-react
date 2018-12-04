@@ -85,10 +85,11 @@ function ChoiceList({
     }
 
     const isSelected = choiceIsSelected(choice, selected);
-    const children = choice.renderChildren ? (
-      <div className={styles.ChoiceChildren}>
-        {choice.renderChildren(isSelected)}
-      </div>
+    const renderedChildren = choice.renderChildren
+      ? choice.renderChildren(isSelected)
+      : null;
+    const children = renderedChildren ? (
+      <div className={styles.ChoiceChildren}>{renderedChildren}</div>
     ) : null;
 
     return (
@@ -108,7 +109,7 @@ function ChoiceList({
   });
 
   const errorMarkup = error && (
-    <div className={styles.ChoiceChildren}>
+    <div className={styles.ChoiceError}>
       <InlineError message={error} fieldID={finalName} />
     </div>
   );

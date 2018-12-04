@@ -25,6 +25,7 @@ keywords:
   - overlay
   - easdk
   - embedded app
+  - shopify app bridge
   - dialog
   - alert
   - android
@@ -34,6 +35,53 @@ keywords:
 # Modal
 
 Modals are overlays that prevent merchants from interacting with the rest of the application until a specific action is taken. They can be disruptive because they require merchants to take an action before they can continue interacting with the rest of Shopify. It should be used thoughtfully and sparingly.
+
+---
+
+## Use in an embedded application
+
+Passing an API key to the [app provider component](https://polaris.shopify.com/components/structure/app-provider#section-initializing-the-shopify-app-bridge) causes the modal component to delegate to the [Shopify App Bridge](https://help.shopify.com/en/api/embedded-apps/app-bridge) instead of rendering as it would in a stand-alone application.
+
+Note in the props table that a number of properties are only available in stand-alone applications, and won't work in an embedded context.
+
+```jsx
+class EmbeddedAppModalExample extends React.Component {
+  state = {
+    modalOpen: false,
+  };
+
+  render() {
+    return (
+      <AppProvider apiKey="YOUR_API_KEY">
+        <Modal
+          src="https://my-app.com/upgrade-to-retail-package"
+          open={this.state.modalOpen}
+          title="Upgrade your Shopify POS with the Retail Package"
+          primaryAction={{
+            content: 'Add Retail Package',
+            onAction: () => this.setState({modalOpen: false}),
+          }}
+          secondaryActions={[
+            {
+              content: 'Cancel',
+              onAction: () => this.setState({modalOpen: false}),
+            },
+          ]}
+          onClose={() => this.setState({modalOpen: false})}
+        />
+      </AppProvider>
+    );
+  }
+}
+```
+
+---
+
+## Best practices
+
+Modals should:
+
+- Only be closed by clicking the `X` or `Cancel` button and not by clicking the backdrop outside the modal, which is a large touch target that could result in accidental presses. Modals require merchants to take an action and should prevent the merchant from accidentally closing the modal without completing the required task.
 
 ---
 
@@ -199,7 +247,7 @@ Use as the default option for a modal.
 ```jsx
 class ModalExample extends React.Component {
   state = {
-    active: false,
+    active: true,
   };
 
   render() {
@@ -252,7 +300,7 @@ const DISCOUNT_LINK = 'https://polaris.shopify.com/';
 
 class ModalExample extends React.Component {
   state = {
-    active: false,
+    active: true,
   };
 
   node = null;
@@ -357,7 +405,7 @@ const CSV_PLAIN = 'csv_plain';
 
 class ModalExample extends React.Component {
   state = {
-    active: false,
+    active: true,
     selectedExport: [],
     selectedExportAs: [],
   };
@@ -458,7 +506,7 @@ Use when you need to increase the width of your modal.
 ```jsx
 class ModalExample extends React.Component {
   state = {
-    active: false,
+    active: true,
     checked: false,
   };
 
@@ -512,6 +560,58 @@ class ModalExample extends React.Component {
 
   handleCheckbox = (value) => {
     this.setState({checked: value});
+  };
+}
+```
+
+### Modal without a title
+
+<!-- example-for: web -->
+
+We recommend you add a title to your modal, but you may leave it blank.
+
+```jsx
+class ModalExample extends React.Component {
+  state = {
+    active: true,
+  };
+
+  render() {
+    const {active} = this.state;
+
+    return (
+      <div style={{height: '500px'}}>
+        <Button onClick={this.handleChange}>Open</Button>
+        <Modal
+          open={active}
+          onClose={this.handleChange}
+          primaryAction={{
+            content: 'Add Instagram',
+            onAction: this.handleChange,
+          }}
+          secondaryActions={[
+            {
+              content: 'Learn more',
+              onAction: this.handleChange,
+            },
+          ]}
+        >
+          <Modal.Section>
+            <TextContainer>
+              <p>
+                Use Instagram posts to share your products with millions of
+                people. Let shoppers buy from your store without leaving
+                Instagram.
+              </p>
+            </TextContainer>
+          </Modal.Section>
+        </Modal>
+      </div>
+    );
+  }
+
+  handleChange = () => {
+    this.setState(({active}) => ({active: !active}));
   };
 }
 ```

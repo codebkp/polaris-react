@@ -13,7 +13,7 @@ keywords:
   - list selection
 ---
 
-# Option List
+# Option list
 
 The option list component lets you create a list of grouped items that
 merchants can pick from. This can include single selection or multiple selection
@@ -167,7 +167,7 @@ Use when a set of selections won’t fit in the available screen space.
 class OptionListExample extends React.Component {
   state = {
     selected: [],
-    popoverActive: false,
+    popoverActive: true,
   };
 
   togglePopover = () => {
