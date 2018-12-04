@@ -341,7 +341,8 @@ class DateSelector extends React.PureComponent<CombinedProps, State> {
       return;
     }
 
-    const nextDate = new Date(userInputDate.replace(/-/g, '/'));
+    const formattedDate = formatDateValue(new Date(userInputDate));
+    const nextDate = new Date(formattedDate);
 
     this.setState(
       {
@@ -409,7 +410,11 @@ function getDateFilterOption(
 }
 
 function formatDateValue(date: Date) {
-  return date.toISOString().slice(0, 10);
+  const tzOffsetTime = new Date(
+    date.getTime() - date.getTimezoneOffset() * 60000,
+  ).toISOString();
+
+  return tzOffsetTime.slice(0, 10);
 }
 
 export default withAppProvider<Props>()(DateSelector);
