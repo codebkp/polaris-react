@@ -252,7 +252,7 @@ class DateSelector extends React.PureComponent<CombinedProps, State> {
     }
 
     if (selectedDate) {
-      return formatDateValue(selectedDate);
+      return formatDateForTimezone(selectedDate);
     }
   }
 
@@ -273,7 +273,7 @@ class DateSelector extends React.PureComponent<CombinedProps, State> {
     if (newOption === DateFilterOption.OnOrBefore) {
       onFilterKeyChange(filterMaxKey);
       onFilterValueChange(
-        selectedDate ? formatDateValue(selectedDate) : undefined,
+        selectedDate ? formatDateForTimezone(selectedDate) : undefined,
       );
       return;
     }
@@ -281,7 +281,7 @@ class DateSelector extends React.PureComponent<CombinedProps, State> {
     if (newOption === DateFilterOption.OnOrAfter) {
       onFilterKeyChange(filterMinKey);
       onFilterValueChange(
-        selectedDate ? formatDateValue(selectedDate) : undefined,
+        selectedDate ? formatDateForTimezone(selectedDate) : undefined,
       );
       return;
     }
@@ -341,8 +341,10 @@ class DateSelector extends React.PureComponent<CombinedProps, State> {
       return;
     }
 
-    const formattedDate = formatDateValue(new Date(userInputDate));
-    const nextDate = new Date(formattedDate);
+    const formattedDateForTimezone = formatDateForTimezone(
+      new Date(userInputDate),
+    );
+    const nextDate = new Date(formattedDateForTimezone);
 
     this.setState(
       {
@@ -364,7 +366,7 @@ class DateSelector extends React.PureComponent<CombinedProps, State> {
       return;
     }
 
-    onFilterValueChange(formatDateValue(selectedDate));
+    onFilterValueChange(formatDateForTimezone(selectedDate));
   }
 
   @autobind
@@ -409,7 +411,7 @@ function getDateFilterOption(
   return filterValue;
 }
 
-function formatDateValue(date: Date) {
+function formatDateForTimezone(date: Date) {
   const tzOffsetTime = new Date(
     date.getTime() - date.getTimezoneOffset() * 60000,
   ).toISOString();
