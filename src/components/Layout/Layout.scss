@@ -25,6 +25,11 @@ $relative-size: $primary-basis / $secondary-basis;
   flex: 1 1 100%;
 }
 
+.Section-evenWidth {
+  flex: 1 1 $primary-basis;
+  min-width: 0;
+}
+
 .AnnotatedSection {
   min-width: 0;
   flex: 1 1 100%;

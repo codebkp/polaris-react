@@ -6,6 +6,8 @@ Use [the changelog guidelines](https://git.io/polaris-changelog-guidelines) to f
 
 ### Enhancements
 
+- Adds `evenWidth` prop to `Layout`
+
 ### Bug fixes
 
 ### Documentation

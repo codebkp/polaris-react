@@ -42,6 +42,12 @@ describe('<Layout />', () => {
 
       expect(section.prop('secondary')).toBe(true);
     });
+
+    it('renders an even width section', () => {
+      const section = mountWithAppProvider(<Layout.Section evenWidth />);
+
+      expect(section.prop('evenWidth')).toBe(true);
+    });
   });
 
   describe('<Layout.AnnotatedSection />', () => {
